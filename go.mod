@@ -3,6 +3,7 @@ module github.com/dhruvbehl/k8-heimdall
 go 1.17
 
 require (
+	github.com/rs/zerolog v1.26.1
 	k8s.io/api v0.23.3
 	k8s.io/apimachinery v0.23.3
 	k8s.io/client-go v0.23.3

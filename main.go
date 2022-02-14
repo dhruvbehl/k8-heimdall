@@ -1,38 +1,19 @@
 package main
 
 import (
-	"encoding/json"
-	"fmt"
+	"flag"
+	"os"
 
-	"time"
-
-	"k8s.io/api/core/v1"
-	"k8s.io/apimachinery/pkg/fields"
-	"k8s.io/client-go/kubernetes"
-	"k8s.io/client-go/tools/cache"
-	ctrl "sigs.k8s.io/controller-runtime"
+	"github.com/dhruvbehl/k8-heimdall/config/kubeconfig"
+	"github.com/dhruvbehl/k8-heimdall/events/watch"
 )
 
 func main() {
-	config := ctrl.GetConfigOrDie()
-	clientset := kubernetes.NewForConfigOrDie(config)
-
-	watchList := cache.NewListWatchFromClient(clientset.CoreV1().RESTClient(),
-	string("Events"), v1.NamespaceAll, fields.Everything())
-
-	_, controller := cache.NewInformer(watchList, &v1.Event{}, 0, cache.ResourceEventHandlerFuncs{
-		AddFunc:    func(obj interface{}) {
-			j, _:= json.MarshalIndent(obj, "", "\t")
-			fmt.Printf("new event received \n\n[%+v]\n\n", string(j))
-		},
-	})
-
-	stop := make(chan struct{})
-	defer close(stop)
-
-	go controller.Run(stop)
-	for {
-		time.Sleep(time.Second)
+	kubeconfig := flag.String("kubeconfig", "", "custom kubeconfig path to be given by user [optional], by default the program uses the default kubeconfig in the env var or ~/.kube/config")
+	flag.Parse()
+	if *kubeconfig != "" {
+		os.Setenv("KUBECONFIG", *kubeconfig)
 	}
-
+	clientset := kubeconfig.Setup()
+	watch.watchEvents(clientset)
 }
