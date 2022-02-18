@@ -1,4 +1,4 @@
-# k8-heimdall
+# K8s-heimdall
 
 ## Description
 Derived from the Norse God [Heimdall](https://www.britannica.com/topic/Heimdall) who keeps watch, this is an implementation of event controller that looks out for any event that occurs on the k8 cluster. This is created in an effort to understand and implement the following:
